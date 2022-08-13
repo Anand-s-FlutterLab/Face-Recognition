@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import numpy as np
 import face_recognition
@@ -30,7 +32,7 @@ def markAttendance(name):
             now = datetime.datetime.now()
             dtString = now.strftime("%H:%M:%S")
             print("-" * 50)
-            print(name + " " + dtString)
+            # print(name + " " + dtString)
             date = datetime.date.today()
             f.write(f'\n{name},{date},{dtString}')
         else:
@@ -42,7 +44,7 @@ print("-"*50)
 print("Program Started")
 print("-"*50)
 print("Data Training Started")
-path = 'photo'
+path = 'photos'
 img = []
 classNames = []
 mylist = os.listdir(path)
@@ -54,10 +56,11 @@ for cls in mylist:
     img.append(curImg)
     classNames.append(os.path.splitext(cls)[0])
 print("-" * 50)
+start_time = time.time()
 print("Encoding Started")
 encodeListKnown = findEncodings(img)
 print("-"*50)
-print("Encoding Complete")
+print("Encoding Complete in {} Minutes".format((time.time() - start_time)/60))
 print("-"*50)
 print("Turning On Webcam")
 cap = cv2.VideoCapture(0)
@@ -77,6 +80,8 @@ while True:
 
         if matches[matchIndex]:
             name = classNames[matchIndex].upper()
+            if name not in nameList:
+                print(name)
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
